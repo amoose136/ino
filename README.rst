@@ -18,6 +18,10 @@ build process to 3-rd party IDE.
 Ino is based on ``make`` to perform builds. However Makefiles are
 generated automatically and you'll never see them if you don't want to.
 
+I (amoose136) forked this in order to add in features waiting in pull 
+requests such as python 3 support since python 2 reaches end of life 
+next year but the main repository hasn't been updated in 4 years.
+
 Features
 ========
 
@@ -43,15 +47,9 @@ Installation
 
 From source:
 
-* `Download latest source tarball <http://pypi.python.org/pypi/ino/#downloads>`_
-* Or clone it from GitHub: ``git clone git://github.com/amperka/ino.git``
+* Clone it from GitHub: ``git clone git://github.com/amoose136/ino.git``
 * Do ``make install`` to perform installation under ``/usr/local``
 * Or see ``INSTALL`` for instructions on changing destination directory
-
-With Python setup tools:
-
-* Either ``pip install ino``
-* Or ``easy_install ino``
 
 Requirements
 ============
@@ -73,7 +71,8 @@ Getting Help
     
 * Take a look at `Quick start tutorial <http://inotool.org/quickstart>`_.
 * Run ``ino --help``.
-* Post `issues to GitHub <http://github.com/amperka/ino/issues>`_.
+* Post `issues to GitHub source repository <http://github.com/amperka/ino/issues>`_.
+* In the issue is unique to my fork, post to `my issue tracker <http://github.com/amoose136/ino/issues>` .
 
 License
 =======
@@ -92,6 +91,9 @@ Contributors
 * `Michael Sproul <https://github.com/gnusouth>`_.
 * `Marc Plano-Lesay <https://github.com/Kernald>`_.
 * `Fabian Kreiser <https://github.com/fabiankr>`_.
+* `Gábor Szeder <https://github.com/szeder>`_.
+* `Nhat Khai Nguyen <https://github.com/nhatkhai>`_.
+* `Carlos Hernández <https://github.com/cxhernandez>`_.
 
 Changelog
 =========
