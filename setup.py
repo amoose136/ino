@@ -15,13 +15,13 @@ import sys
 i=0
 for e in sys.argv:
     if e=='uninstall':
-        print "running uninstall"
+        print("running uninstall")
         import glob
         import os
         for a in glob.glob('install_*_%s.txt' % sys.platform):
             for f in file(a).read().split('\n'):
                 if os.path.isfile(f):
-                    print "Remove ", f
+                    print("Remove ", f)
                     os.remove(f)
         sys.argv.pop(i)
     else:
@@ -42,8 +42,8 @@ def gen_data_files(package_dir, subdir):
     import os.path
     results = []
     for root, dirs, files in os.walk(os.path.join(package_dir, subdir)):
-        results.extend([os.path.join(root, f)[len(package_dir)+1:] 
-                        for f in files])
+        files = [os.path.join(root, f)[len(package_dir) + 1:] for f in files]
+        results.extend(files)
     return results
 
 ino_package_data = (gen_data_files('ino', 'make') + 
@@ -60,7 +60,7 @@ for i, e in enumerate(sys.argv):
             sys.argv.insert(i+1,'--record')
             sys.argv.insert(i+2,'install_%s_%s.txt' % (__version__, sys.platform))
         except ImportError as e:
-            print "Require module is not found: ", e.message
+            print("Require module is not found: ", e.message)
             quit()
         break
 
@@ -84,6 +84,9 @@ setup(
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Topic :: Software Development :: Embedded Systems",
     ],
     **extra

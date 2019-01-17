@@ -1,24 +1,19 @@
 # -*- coding: utf-8; -*-
 
-import sys
-import os.path
-import itertools
 import argparse
+from collections import OrderedDict
+from collections import namedtuple
+from glob2 import glob
+import hashlib
+import itertools
+import json
+import os.path
 import pickle
 import platform
-import hashlib
 import re
 from serial.tools.list_ports import comports
 import serial
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Python < 2.7
-    from ordereddict import OrderedDict
-
-from collections import namedtuple
-from glob2 import glob
+import sys
 
 from ino.filters import colorize
 from ino.utils import format_available_options
@@ -27,7 +22,7 @@ from ino.exc import Abort
 
 class Version(namedtuple('Version', 'major minor build')):
 
-    regex = re.compile(ur'^([^:]+:)?(\d+(\.\d+(\.\d+)?)?)')
+    regex = re.compile(r'^([^:]+:)?(\d+(\.\d+(\.\d+)?)?)')
 
     @classmethod
     def parse(cls, s):
@@ -49,7 +44,7 @@ class Version(namedtuple('Version', 'major minor build')):
             # looks like old 0022 or something like that
             return cls(0, int(v), 0)
 
-        parts = map(int, v.split('.'))
+        parts = list(map(int, v.split('.')))
 
         # append nulls if they were not explicit
         while len(parts) < 3:
@@ -105,17 +100,18 @@ class Environment(dict):
         if not os.path.isdir(self.output_dir):
             return
         with open(self.dump_filepath, 'wb') as f:
-            pickle.dump(self.items(), f)
+            pickle.dump(tuple(self.items()),f)
 
     def load(self):
         if not os.path.exists(self.dump_filepath):
             return
+
         with open(self.dump_filepath, 'rb') as f:
             try:
-                self.update(pickle.load(f))
+                self.update(dict(pickle.load(f)))
             except:
-                print colorize('Environment dump exists (%s), but failed to load' % 
-                               self.dump_filepath, 'yellow')
+                print(colorize('Environment dump exists ({}), but failed to load'
+                               ''.format(self.dump_filepath), 'yellow'))
 
     @property
     def dump_filepath(self):
@@ -167,7 +163,7 @@ class Environment(dict):
 
         glob_places = itertools.chain.from_iterable(glob(os.path.abspath(p)) for p in places)
         
-        print 'Searching for', human_name, '...',
+        print('Searching for', human_name, '...', end='')
         test_func = os.path.isfile if join else os.path.exists
         results = []
         for p in glob_places:
@@ -187,7 +183,7 @@ class Environment(dict):
                       result = '/'.join(result)
 
                     if not multi:
-                        print colorize(result, 'green')
+                        print(colorize(result, 'green'))
                         self[key] = result
                         return result
                     results.append(result)
@@ -195,14 +191,14 @@ class Environment(dict):
         if results:
             if len(results) > 1:
                 formatted_results = ''.join(['\n  - ' + x for x in results])
-                print colorize('found multiple: %s' % formatted_results, 'green')
+                print(colorize('found multiple: %s' % formatted_results, 'green'))
             else:
-                print colorize(results[0], 'green')
+                print(colorize(results[0], 'green'))
 
             self[key] = results
             return results
 
-        print colorize('FAILED', 'red')
+        print(colorize('FAILED', 'red'))
         raise Abort("%s not found. Searched in following places: %s" %
                     (human_name, ''.join(['\n  - ' + p for p in places])))
 
@@ -361,17 +357,17 @@ class Environment(dict):
 
     def guess_serial_port(self, serial_port=None):
         if serial_port is None:
-          print 'Guessing serial port ...',
+          print('Guessing serial port ...', end='')
         else:
-          print 'Check serial port %s ...' % serial_port,
+          print('Check serial port %s ...' % serial_port, end='')
 
         ports = self.list_serial_ports(serial_port)
         if ports:
             result = ports[0]
-            print colorize(ports[0][1], 'yellow')
+            print(colorize(ports[0][1], 'yellow'))
             return result
 
-        print colorize('FAILED', 'red')
+        print(colorize('FAILED', 'red'))
         return None
         # raise Abort("No device matching following was found: %s" %
         #             (''.join(['\n  - ' + p for p in self.serial_port_patterns()])))
@@ -385,8 +381,8 @@ class Environment(dict):
         if board_model:
             all_models = self.board_models()
             if board_model not in all_models:
-                print "Supported Arduino board models are:"
-                print all_models.format()
+                print("Supported Arduino board models are:")
+                print(all_models.format())
                 raise Abort('%s is not a valid board model' % board_model)
 
         # Build artifacts for each Arduino distribution / Board model
@@ -405,16 +401,16 @@ class Environment(dict):
 
         if 'arduino_lib_version' not in self:
             with open(self['version.txt']) as f:
-                print 'Detecting Arduino software version ... ',
+                print('Detecting Arduino software version ... ', end='')
                 v_string = f.read().strip()
                 v = Version.parse(v_string)
                 self['arduino_lib_version'] = v
-                print colorize("%s (%s)" % (v, v_string), 'green')
+                print(colorize("%s (%s)" % (v, v_string), 'green'))
 
         return self['arduino_lib_version']
 
 
 class BoardModels(OrderedDict):
     def format(self):
-        map = [(key, val['name']) for key, val in self.iteritems() if 'name' in val]
+        map = [(key, val['name']) for key, val in self.items() if 'name' in val]
         return format_available_options(map, head_width=12, default=self.default)

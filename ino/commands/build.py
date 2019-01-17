@@ -235,7 +235,7 @@ class Build(Command):
         os.environ['PATH'] = os.path.dirname(os.path.abspath(self.e.make)) + os.pathsep + old_path
 
         makefile = self.render_template(makefile + '.jinja', makefile, **kwargs)
-        print "*** RUN %s ..." % (makefile)
+        print("*** RUN %s ..." % (makefile))
         ret = subprocess.call([self.e.make , '-f', makefile, 'all'])
 
         os.environ['PATH'] = old_path
@@ -263,7 +263,7 @@ class Build(Command):
         used_libs = set()
         with open(output_filepath) as f:
             for line in f:
-                for lib, regex in regexes.iteritems():
+                for lib, regex in regexes.items():
                         if regex.search(line) and lib != dir:                        
                             lib = os.path.abspath(lib)
                             lib = os.path.relpath(lib, os.getcwd())

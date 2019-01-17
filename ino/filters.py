@@ -98,8 +98,8 @@ def libmap(source_dirs, target_dir):
 
 @_filter
 def colorize(s, color):
-	if platform.system() == 'Windows':
-		return s
+    if platform.system() == 'Windows':
+        return s
 
     if not sys.stdout.isatty():
         return s

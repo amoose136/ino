@@ -1,15 +1,8 @@
 # -*- coding: utf-8; -*-
 
+from collections import OrderedDict
 import os.path
 import itertools
-
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Python < 2.7
-    from ordereddict import OrderedDict
-
 
 class SpaceList(list):
     def __add__(self, other):
@@ -24,13 +17,13 @@ class SpaceList(list):
 
 class FileMap(OrderedDict):
     def sources(self):
-        return SpaceList(self.iterkeys())
+        return SpaceList(self.keys())
 
     def targets(self):
-        return SpaceList(self.itervalues())
+        return SpaceList(self.values())
 
     def iterpaths(self):
-        for source, target in self.iteritems():
+        for source, target in self.items():
             yield (source.path, target.path)
 
     def target_paths(self):
@@ -40,7 +33,7 @@ class FileMap(OrderedDict):
 def list_subdirs(dirname, recursive=False, exclude=[]):
     entries = [e for e in os.listdir(dirname) if e not in exclude and not e.startswith('.')]
     paths = [os.path.join(dirname, e) for e in entries]
-    dirs = filter(os.path.isdir, paths)
+    dirs = list(filter(os.path.isdir, paths))
     if recursive:
         sub = itertools.chain.from_iterable(
             list_subdirs(d, recursive=True, exclude=exclude) for d in dirs)
