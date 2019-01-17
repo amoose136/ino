@@ -12,3 +12,7 @@ Examples:
 
     * make install DESTDIR=~/ino
     * make install PREFIX=/usr
+
+
+If you would like to use Bash completion for ino's subcommands and arguments,
+have a look at the instructions in `bash-completion/ino'.

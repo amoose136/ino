@@ -1,0 +1,121 @@
+# bash completion for ino, a command line toolkit for Arduino
+#
+# Depending on your system, privileges and preferences you might want to
+# copy this file either
+#
+#  * to the standard /usr/share/bash-completion/completions directory to be
+#    sourced on demand
+#  * to the legacy /etc/bash_completion.d directory to be sourced
+#    automatically for every interactive shell
+#  * to wherever you please, or not copy at all, and source it yourself from
+#    your .bashrc
+
+_ino_complete_board_models()
+{
+	local c=$cword dist_path list board_models
+
+	while [ $c -ge 2 ]; do
+		if [ "${words[c]}" = "--arduino-dist" ]; then
+			dist_path="${words[++c]}"
+			break
+		fi
+		((c--))
+	done
+
+	list="$(ino list-models ${dist_path:+--arduino-dist "$dist_path"} 2>/dev/null)"
+	if [ $? != 0 ]; then
+		# 'ino list-models' failed, probably because of bogus
+		# '--arduino-dist <path>' given on the command line.
+		# Don't offer anything for completion.
+		return
+	fi
+	board_models="$(echo "$list" | sed -n -e 's/: .*//p')"
+
+	COMPREPLY=( $( compgen -W "$board_models" -- "$cur" ) )
+}
+
+_ino()
+{
+	local cur prev words cword
+
+	_init_completion -n : || return
+
+	if [ $cword = 1 ]; then
+		COMPREPLY=( $( compgen -W "build clean init list-models
+			preproc serial upload --help" -- "$cur" ) )
+		return
+	fi
+
+	case "${words[1]}" in
+	build)
+		case "$prev" in
+		--arduino-dist|--make|--cc|--cxx|--ar|--objcopy)
+			;;
+		--board-model)
+			_ino_complete_board_models
+			;;
+		*)
+			COMPREPLY=( $( compgen -W "--help --board-model
+				--arduino-dist --make --cc --cxx --ar --objcopy
+				--cppflags --cflags --cxxflags --ldflags
+				--verbose" -- "$cur" ) )
+			;;
+		esac
+		;;
+	clean)
+		COMPREPLY=( $( compgen -W "--help" -- "$cur" ) )
+		;;
+	init)
+		COMPREPLY=( $( compgen -W "--help --template" -- "$cur" ) )
+		;;
+	list-models)
+		case "$prev" in
+		--arduino-dist)
+			;;
+		*)
+			COMPREPLY=( $( compgen -W "--help --arduino-dist" \
+				-- "$cur" ) )
+			;;
+		esac
+		;;
+	preproc)
+		case "$prev" in
+		--arduino-dist|--output)
+			;;
+		*)
+			COMPREPLY=( $( compgen -W "--help --arduino-dist
+				--output" -- "$cur" ) )
+			;;
+		esac
+		;;
+	serial)
+		case "$prev" in
+		--serial-port)
+			;;
+		--baud-rate)
+			COMPREPLY=( $( compgen -W "300 600 1200 2400 4800
+				9600 14400 19200 28800 38400 57600 115200
+				" -- "$cur" ) )
+			;;
+		*)
+			COMPREPLY=( $( compgen -W "--help --serial-port
+				--baud-rate" -- "$cur" ) )
+			;;
+		esac
+		;;
+	upload)
+		case "$prev" in
+		--arduino-dist|--serial-port)
+			;;
+		--board-model)
+			_ino_complete_board_models
+			;;
+		*)
+			COMPREPLY=( $( compgen -W "--help --serial-port
+				--board-model --arduino-dist" -- "$cur" ) )
+			;;
+		esac
+		;;
+	esac
+} &&
+complete -o bashdefault -o default -F _ino ino
