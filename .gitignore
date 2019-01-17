@@ -6,3 +6,4 @@ dist
 ino.egg-info
 doc/.build
 .*.sw[op]
+.eggs/
