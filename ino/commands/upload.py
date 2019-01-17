@@ -37,9 +37,9 @@ class Upload(Command):
 
     def discover(self):
         if platform.system() == 'Linux':
-        	self.e.find_tool('stty', ['stty'])
+            self.e.find_tool('stty', ['stty'])
             self.e.find_arduino_tool('avrdude', ['hardware', 'tools'])
-
+            
             conf_places = self.e.arduino_dist_places(['hardware', 'tools'])
             conf_places.append('/etc/avrdude') # fallback to system-wide conf on Fedora
             self.e.find_file('avrdude.conf', places=conf_places)
@@ -47,13 +47,13 @@ class Upload(Command):
         elif platform.system()== 'Windows':
             self.e.find_arduino_tool('avrdude.exe', ['hardware', 'tools', 'avr', 'bin'])
             self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools', 'avr', 'etc'])
-
+            
         elif platform.system().startswith('CYGWIN'):
             self.e.find_arduino_tool('avrdude', ['hardware', 'tools', 'avr', 'bin'])
             self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools', 'avr', 'etc'])
 
         else:
-        	self.e.find_tool('stty', ['stty'])
+            self.e.find_tool('stty', ['stty'])
             self.e.find_arduino_tool('avrdude', ['hardware', 'tools', 'avr', 'bin'])
             self.e.find_arduino_file('avrdude.conf', ['hardware', 'tools', 'avr', 'etc'])
     
@@ -62,7 +62,7 @@ class Upload(Command):
         
         port = args.serial_port or self.e.guess_serial_port()
         board = self.e.board_model(args.board_model)
-		protocol = board['upload']['protocol']
+        protocol = board['upload']['protocol']
         if protocol == 'stk500':
             # if v1 is not specifid explicitly avrdude will
             # try v2 first and fail
@@ -136,8 +136,8 @@ class Upload(Command):
 
             port = new_port
         
-        print "Used %s for programming." % port[0]
-        print "Used %s protocol" % protocol
+        print("Used %s for programming." % port[0])
+        print("Used %s protocol" % protocol)
 
         # call avrdude to upload .hex
         subprocess.call([

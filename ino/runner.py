@@ -58,12 +58,15 @@ def main():
         run_anywhere = "init clean list-models serial"
 
         in_project_dir = os.path.isdir(e.src_dir)
-        if not in_project_dir and current_command not in run_anywhere:
-            raise Abort("No project found in this directory.")
+
+        if not in_project_dir and current_command:
+            print(current_command)
+            if current_command not in run_anywhere:
+                raise Abort("No project found in this directory.")
 
         e.process_args(args)
 
-        if current_command not in run_anywhere:
+        if current_command and current_command not in run_anywhere:
             # For valid projects create .build & lib
             if not os.path.isdir(e.build_dir):                
                 os.makedirs(e.build_dir)
@@ -72,8 +75,8 @@ def main():
                 os.makedirs(e.lib_dir)
                 with open('lib/.holder', 'w') as f:
                     f.write("")
-
-        args.func(args)
+        if current_command:
+            args.func(args)
     except Abort as exc:
         print(colorize(str(exc), 'red'))
         sys.exit(1)
