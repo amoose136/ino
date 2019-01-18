@@ -1,6 +1,6 @@
 
 DESTDIR=/
-PREFIX=/usr/local
+PREFIX=/usr
 
 all:
 	@# do nothing yet

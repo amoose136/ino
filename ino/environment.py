@@ -1,5 +1,5 @@
 # -*- coding: utf-8; -*-
-
+from __future__ import print_function
 import argparse
 from collections import OrderedDict
 from collections import namedtuple
@@ -78,6 +78,12 @@ class Environment(dict):
         arduino_dist_dir_guesses.insert(0, '/cygdrive/c/Progra~2/Arduino')
         arduino_dist_dir_guesses.insert(0, '/cygdrive/c/Progra~3/Arduino')
         arduino_dist_dir_guesses.insert(0, '/cygdrive/c/Progra~4/Arduino')
+    elif platform.system().startswith('MSYS_NT'):
+        arduino_dist_dir_guesses.insert(0, '/c/Progra~1/Arduino')
+        arduino_dist_dir_guesses.insert(0, '/c/Progra~2/Arduino')
+        arduino_dist_dir_guesses.insert(0, '/c/Progra~3/Arduino')
+        arduino_dist_dir_guesses.insert(0, '/c/Progra~4/Arduino')
+        # arduino_dist_dir_guesses.insert(0, '/c/Program Files/Arduino')
     elif platform.system() == 'Windows':
         arduino_dist_dir_guesses.insert(0, 'c:\\Arduino')
         arduino_dist_dir_guesses.insert(0, 'c:\\Progra~1\\Arduino')
@@ -152,7 +158,7 @@ class Environment(dict):
         if key in self:
             return self[key]
 
-        human_name = human_name or key
+        human_name = human_name or key or 'Null'
         
         # make sure search on current directy first
         #places.insert(0,'.') 
@@ -162,7 +168,7 @@ class Environment(dict):
         places = map(os.path.expanduser, places)
 
         glob_places = itertools.chain.from_iterable(glob(os.path.abspath(p)) for p in places)
-        
+
         print('Searching for', human_name, '...', end='')
         test_func = os.path.isfile if join else os.path.exists
         results = []
